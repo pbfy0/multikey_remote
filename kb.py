@@ -50,6 +50,7 @@ class Keyboard:
 			is_ui = bool(v & 0x80000000)
 			vk = v & 0xff
 			mask = (v >> 8) & 0x7fffff
+#			print('{:08x}: {} {} {}'.format(v, is_ui, vk, mask))
 			if vk == 0xff and mask == 0x7fffff:
 				self._maps[is_ui].clear()
 			else:

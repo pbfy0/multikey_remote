@@ -2,7 +2,7 @@
 <head>
 <script src="/static/socket.io-1.4.5.js"></script>
 <script>
-	var socket = io(location.origin + '/key')
+	var socket = io(location.host + '/key', {transports: ['websocket', 'polling-xhr', 'polling']})
 	var name = prompt('Name')
 	socket.emit('hello', {name: name})
 	var ui_map, g_map;
@@ -13,16 +13,18 @@
 				ui_map = val.ui
 				g_map = val.g
 				window.addEventListener('keydown', function(ev) {
-					ev.preventDefault()
 					var vk = ev.keyCode
-					if(vk in ui_map) socket.emit('keydown', {ui: true, mask: ui_map[vk]})
-					if(vk in g_map) socket.emit('keydown', {ui: false, mask: g_map[vk]})
+					if(vk in ui_map || vk in g_map) {
+						ev.preventDefault()
+						socket.emit('keydown', {ui: ui_map[vk] || 0, g: g_map[vk] || 0})
+					}
 				})
 				window.addEventListener('keyup', function(ev) {
-					ev.preventDefault()
 					var vk = ev.keyCode
-					if(vk in ui_map) socket.emit('keyup', {ui: true, mask: ui_map[vk]})
-					if(vk in g_map) socket.emit('keyup', {ui: false, mask: g_map[vk]})
+					if(vk in ui_map || vk in g_map) {
+						ev.preventDefault()
+						socket.emit('keyup', {ui: ui_map[vk] || 0, g: g_map[vk] || 0})
+					}
 				})
 				window.addEventListener('beforeunload', function(ev) {
 					socket.disconnect()
