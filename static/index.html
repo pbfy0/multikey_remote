@@ -6,12 +6,78 @@
 	var name = prompt('Name')
 	socket.emit('hello', {name: name})
 	var ui_map, g_map;
+	var r_ui_map = {}, r_g_map = {};
+	var ag_map = {
+		4: 1,
+		5: 2,
+		1: 4,
+		2: 8,
+		6: 128,
+		9: 64, 
+		7: 256,
+		10: 65536,
+		11: 32768,
+		3: 16,
+		8: 512,
+		27: 32,
+		13: 1024,
+		14: 2048,
+		15: 4096,
+		16: 8192,
+		23: 32768,
+	}
+	var aui_map = {
+		17: 1,
+		18: 2,
+		20: 4,
+		21: 8,
+		24: 16,
+		25: 32,
+		23: 1024,
+		19: 2048,
+		4: 4096,
+		5: 8192,
+		1: 16384,
+		2: 32768,
+		31: 256,
+		32: 512,
+		29: 64,
+		30: 128,
+	}
+	var r = {}
+	for(var k in ag_map) {
+		r[ag_map[k]] = k|0
+	}
+	ag_map.r = r;
+	r = {}
+	for(var k in aui_map) {
+		r[aui_map[k]] = k|0
+	}
+	aui_map.r = r;
 	socket.on('ack', function(val) {
 		setTimeout(function() {
 			socket.emit('get_maps')
 			socket.on('maps', function(val) {
+				var m = {}
+				var ee = document.getElementsByTagName('input');
+				for(var e = 0; e < ee.length; e++) {
+					m[ee[e].getAttribute('data-id')|0] = ee[e];
+				}
+				console.log(m);
 				ui_map = val.ui
 				g_map = val.g
+				for(var k in ui_map) {
+					r_ui_map[ui_map[k]] = k|0
+					var q = m[aui_map.r[ui_map[k]]]
+					if(q) q.value = k
+				}
+				for(var k in g_map) {
+					r_g_map[g_map[k]] = k|0
+					var q = m[ag_map.r[g_map[k]]]
+					if(q) q.value = k
+
+				}
+
 				window.addEventListener('keydown', function(ev) {
 					var vk = ev.keyCode
 					if(vk in ui_map || vk in g_map) {
@@ -31,12 +97,28 @@
 				})
 			})
 		}, 1000)
-		/*window.addEventListener('beforeunload', function(ev) {
-			socket.emit('dc')
-		})*/
 	})
 </script>
 </head>
 <body>
+<table>
+<tr><td>Up/Jump</td><td><input type="text" data-id="4" /></td></tr>
+<tr><td>Down/Drop</td><td><input type="text" data-id="5" /></td></tr>
+<tr><td>Aim Up</td><td><input type="text" data-id="27" /></td></tr>
+<tr><td>Left</td><td><input type="text" data-id="1" /></td></tr>
+<tr><td>Right</td><td><input type="text" data-id="2" /></td></tr>
+<tr><td>Quick Attack</td><td><input type="text" data-id="6" /></td></tr>
+<tr><td>Heavy Attack</td><td><input type="text" data-id="9" /></td></tr>
+<tr><td>Dodge</td><td><input type="text" data-id="7" /></td></tr>
+<tr><td>Throw Item</td><td><input type="text" data-id="8" /></td></tr>
+<tr><td>Show Names</td><td><input type="text" data-id="10" /></td></tr>
+<tr><td>/</td><td><input type="text" data-id="28" /></td></tr>
+<tr><td>Pause/Options</td><td><input type="text" data-id="11" /></td></tr>
+<tr><td>Jump</td><td><input type="text" data-id="3" /></td></tr>
+<tr><td>Taunt 1</td><td><input type="text" data-id="13" /></td></tr>
+<tr><td>Taunt 2</td><td><input type="text" data-id="14" /></td></tr>
+<tr><td>Taunt 3</td><td><input type="text" data-id="15" /></td></tr>
+<tr><td>Taunt 4</td><td><input type="text" data-id="16" /></td></tr>
+</table>
 </body>
 </html>
